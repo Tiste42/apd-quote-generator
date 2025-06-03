@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APD Insurance Quote Generator</title>
+    <meta property="og:title" content="APD Insurance Quote Generator">
+    <meta property="og:description" content="Streamline your Auto Physical Damage insurance quotes for rideshare and livery services">
+    <meta property="og:type" content="website">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { margin: 0; }
+            .quote-document { 
+                max-width: 100% !important; 
+                box-shadow: none !important;
+                border: none !important;
+            }
+        }
+        .print-only { display: none; }
+        
+        .logo-container {
+            width: 200px;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6 no-print">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800"><i class="fas fa-file-invoice-dollar mr-2"></i>APD Quote Generator</h1>
+                    <p class="text-gray-600 mt-1">Auto Physical Damage Insurance for Rideshare & Livery Services</p>
+                </div>
+                <div class="text-right">
+                    <button onclick="loadSampleData()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-magic mr-1"></i>Load Sample
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Input Form -->
+            <div class="bg-white rounded-lg shadow-md p-6 no-print">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800"><i class="fas fa-edit mr-2"></i>Quote Information</h2>
+                
+                <form id="quoteForm">
+                    <!-- Basic Information -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Named Insured</label>
+                        <input type="text" id="namedInsured" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Hayasatrans">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">TIV (Total Insured Value)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-gray-500">$</span>
+                                <input type="number" id="tiv" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="68000">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Rate (%)</label>
+                            <div class="relative">
+                                <input type="number" id="rate" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="6.00">
+                                <span class="absolute right-3 top-2 text-gray-500">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carrier Selection -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Carrier</label>
+                        <select id="carrier" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="LLOYDS">LLOYDS</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Fee Overrides -->
+                    <div class="border-t pt-4 mb-4">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2">Fee Overrides (Optional)</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Broker Fee (Non-taxable)</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2 text-gray-500">$</span>
+                                    <input type="number" id="brokerFeeOverride" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Auto">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Carrier Fee (Taxable)</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2 text-gray-500">$</span>
+                                    <input type="number" id="carrierFee" value="100" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Driver Options -->
+                    <div class="mb-4 space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="amendedDriver" class="mr-2">
+                            <span class="text-sm text-gray-700">Amended Driver Criteria (3yr minimum)</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="namedDriversOnly" class="mr-2">
+                            <span class="text-sm text-gray-700">Named Drivers Only</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg transition duration-200">
+                        <i class="fas fa-calculator mr-2"></i>Generate Quote
+                    </button>
+                </form>
+
+                <!-- Calculation Results -->
+                <div id="calculationResults" class="mt-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Calculation Breakdown</h3>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div id="breakdownDetails" class="space-y-2 text-sm"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote Preview -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between mb-4 no-print">
+                    <h2 class="text-xl font-semibold text-gray-800"><i class="fas fa-file-alt mr-2"></i>Quote Preview</h2>
+                    <div>
+                        <button onclick="printQuote()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-2" id="printBtn" disabled>
+                            <i class="fas fa-print mr-1"></i>Print
+                        </button>
+                        <button onclick="saveQuote()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg" id="saveBtn" disabled>
+                            <i class="fas fa-save mr-1"></i>Save PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="quoteDocument" class="quote-document border border-gray-300 rounded-lg p-8 min-h-[600px] bg-white">
+                    <div class="text-center text-gray-400">
+                        <i class="fas fa-file-invoice fa-4x mb-4"></i>
+                        <p>Quote will appear here after generation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Rate Calculator Class - Updated for CA tax rules
+        class APDRateCalculator {
+            constructor() {
+                this.feeStructure = [
+                    { min: 0, max: 1999, fee: 175 },
+                    { min: 2000, max: 3999, fee: 200 },
+                    { min: 4000, max: 8999, fee: 250 },
+                    { min: 9000, max: 19999, fee: 350 },
+                    { min: 20000, max: Infinity, fee: 500 }
+                ];
+                
+                this.surplusLinesTaxRate = 0.03;  // 3%
+                this.stampingFeeRate = 0.0018;    // 0.18%
+            }
+
+            getBrokerFee(premium) {
+                for (const tier of this.feeStructure) {
+                    if (premium >= tier.min && premium <= tier.max) {
+                        return tier.fee;
+                    }
+                }
+                return 500; // Default
+            }
+
+            calculate(tiv, rate, customBrokerFee = null, carrierFee = 100) {
+                const domesticPremium = tiv * (rate / 100);
+                const brokerFee = customBrokerFee || this.getBrokerFee(domesticPremium);
+                
+                // CA Tax Rules: Carrier fee is taxable, broker fee is not
+                const taxableAmount = domesticPremium + carrierFee;
+                const surplusLinesTax = taxableAmount * this.surplusLinesTaxRate;
+                const stampingFee = taxableAmount * this.stampingFeeRate;
+                
+                const totalCost = domesticPremium + brokerFee + carrierFee + surplusLinesTax + stampingFee;
+
+                return {
+                    tiv: tiv,
+                    rate: rate,
+                    domesticPremium: Math.round(domesticPremium * 100) / 100,
+                    brokerFee: brokerFee,
+                    carrierFee: carrierFee,
+                    taxableAmount: Math.round(taxableAmount * 100) / 100,
+                    surplusLinesTax: Math.round(surplusLinesTax * 100) / 100,
+                    stampingFee: Math.round(stampingFee * 100) / 100,
+                    totalCost: Math.round(totalCost * 100) / 100
+                };
+            }
+        }
+
+        const calculator = new APDRateCalculator();
+        let currentQuote = null;
+
+        // Form submission handler
+        document.getElementById('quoteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const namedInsured = document.getElementById('namedInsured').value;
+            const tiv = parseFloat(document.getElementById('tiv').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+            const carrier = document.getElementById('carrier').value;
+            const brokerFeeOverride = document.getElementById('brokerFeeOverride').value ? 
+                parseFloat(document.getElementById('brokerFeeOverride').value) : null;
+            const carrierFee = parseFloat(document.getElementById('carrierFee').value);
+            const amendedDriver = document.getElementById('amendedDriver').checked;
+            const namedDriversOnly = document.getElementById('namedDriversOnly').checked;
+
+            if (!namedInsured || !tiv || !rate) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Calculate quote
+            const calculation = calculator.calculate(tiv, rate, brokerFeeOverride, carrierFee);
+            
+            // Store current quote
+            currentQuote = {
+                namedInsured,
+                carrier,
+                amendedDriver,
+                namedDriversOnly,
+                ...calculation,
+                quoteDate: new Date().toISOString(),
+                quoteNumber: 'APD-' + Date.now().toString().slice(-8)
+            };
+
+            // Display calculation breakdown
+            displayCalculationBreakdown(calculation);
+            
+            // Generate quote document
+            generateQuoteDocument(currentQuote);
+            
+            // Enable action buttons
+            document.getElementById('printBtn').disabled = false;
+            document.getElementById('saveBtn').disabled = false;
+        });
+
+        function displayCalculationBreakdown(calc) {
+            const breakdown = document.getElementById('breakdownDetails');
+            breakdown.innerHTML = `
+                <div class="flex justify-between"><span class="text-gray-600">Domestic Premium:</span><span class="font-medium">$${calc.domesticPremium.toFixed(2)}</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Broker Fee (Non-taxable):</span><span class="font-medium">$${calc.brokerFee.toFixed(2)}</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Carrier Fee (Taxable):</span><span class="font-medium">$${calc.carrierFee.toFixed(2)}</span></div>
+                <div class="flex justify-between border-t pt-2"><span class="text-gray-600">Taxable Amount:</span><span class="font-medium">$${calc.taxableAmount.toFixed(2)}</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Surplus Lines Tax (3%):</span><span class="font-medium">$${calc.surplusLinesTax.toFixed(2)}</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Stamping Fee (0.18%):</span><span class="font-medium">$${calc.stampingFee.toFixed(2)}</span></div>
+                <div class="border-t pt-2 mt-2 flex justify-between font-semibold"><span>Total Cost to Insured:</span><span class="text-green-600">$${calc.totalCost.toFixed(2)}</span></div>
+            `;
+            document.getElementById('calculationResults').classList.remove('hidden');
+        }
+
+        function generateQuoteDocument(quote) {
+            const quoteDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // Determine driver criteria text
+            let driverCriteriaText = '';
+            if (quote.namedDriversOnly) {
+                driverCriteriaText = '<p><i class="fas fa-check text-green-500 mr-2"></i>Named Drivers Only</p>';
+            } else if (quote.amendedDriver) {
+                driverCriteriaText = '<p><i class="fas fa-check text-green-500 mr-2"></i>WRB driver criteria (Amended 3yr minimum)</p>';
+            } else {
+                driverCriteriaText = '<p><i class="fas fa-check text-green-500 mr-2"></i>WRB driver criteria (standard)</p>';
+            }
+            
+            const quoteHTML = `
+                <div class="space-y-6">
+                    <!-- Header with Logo -->
+                    <div class="border-b pb-4">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-start space-x-4">
+                                <div class="logo-container">
+                                    <img src="./activeexcesslogo.jpg" 
+                                         alt="Active E&S Underwriters" 
+                                         class="w-48 h-auto"
+                                         style="max-width: 200px;"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div style="display:none; width:200px; height:60px; background:#f3f4f6; border:2px dashed #d1d5db; display:flex; align-items:center; justify-content:center; font-size:12px; color:#6b7280; text-align:center;">
+                                        Active E&S Underwriters Logo
+                                    </div>
+                                </div>
+                                <div>
+                                    <h1 class="text-2xl font-bold text-gray-800">AUTO PHYSICAL DAMAGE QUOTE</h1>
+                                    <p class="text-gray-600 mt-1">Quote #: ${quote.quoteNumber}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-600">Date: ${quoteDate}</p>
+                                <p class="text-sm text-gray-600">Valid for 30 days</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Named Insured Section -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-2">NAMED INSURED</h2>
+                        <p class="text-xl font-medium">${quote.namedInsured}</p>
+                    </div>
+
+                    <!-- Coverage Details -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-3">COVERAGE DETAILS</h2>
+                        <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+                            <div class="flex justify-between"><span class="font-medium">Carrier:</span><span>${quote.carrier}</span></div>
+                            <div class="flex justify-between"><span class="font-medium">Coverage Type:</span><span>APD - Auto Physical Damage</span></div>
+                            <div class="flex justify-between"><span class="font-medium">Total Insured Value:</span><span>$${quote.tiv.toLocaleString()}</span></div>
+                            <div class="flex justify-between"><span class="font-medium">Rate:</span><span>${quote.rate}%</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Coverage Terms -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-3">COVERAGE TERMS</h2>
+                        <div class="space-y-2 text-sm">
+                            <p><i class="fas fa-check text-green-500 mr-2"></i>WRB 2.5k GDE ENDT (standard)</p>
+                            <p><i class="fas fa-check text-green-500 mr-2"></i>NMA1650</p>
+                            <p><i class="fas fa-check text-green-500 mr-2"></i>Limit: $${quote.tiv.toLocaleString()} Any one loss / Any one unit</p>
+                            ${driverCriteriaText}
+                            <p><i class="fas fa-check text-green-500 mr-2"></i>$5,000 AOL sublimit tow/store/recovery</p>
+                            <p><i class="fas fa-check text-green-500 mr-2"></i>WRB APD endt</p>
+                            <p><i class="fas fa-check text-green-500 mr-2"></i>LMA9191</p>
+                            <p><i class="fas fa-check text-green-500 mr-2"></i>Condition precedent to coverage all journey's 100% pre-arranged/booked</p>
+                        </div>
+                    </div>
+
+                    <!-- Premium Breakdown -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-3">PREMIUM BREAKDOWN</h2>
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <div class="space-y-2">
+                                <div class="flex justify-between"><span>Domestic Premium:</span><span class="font-medium">$${quote.domesticPremium.toFixed(2)}</span></div>
+                                <div class="flex justify-between"><span>Broker Fee (Non-taxable):</span><span class="font-medium">$${quote.brokerFee.toFixed(2)}</span></div>
+                                <div class="flex justify-between"><span>Carrier Fee (Taxable):</span><span class="font-medium">$${quote.carrierFee.toFixed(2)}</span></div>
+                                <div class="flex justify-between border-t pt-2"><span class="text-sm text-gray-600">Taxable Amount:</span><span class="text-sm font-medium">$${quote.taxableAmount.toFixed(2)}</span></div>
+                                <div class="flex justify-between"><span>Surplus Lines Tax (3%):</span><span class="font-medium">$${quote.surplusLinesTax.toFixed(2)}</span></div>
+                                <div class="flex justify-between"><span>Stamping Fee (0.18%):</span><span class="font-medium">$${quote.stampingFee.toFixed(2)}</span></div>
+                            </div>
+                            <div class="border-t mt-3 pt-3">
+                                <div class="flex justify-between text-lg font-semibold">
+                                    <span>TOTAL PREMIUM:</span>
+                                    <span class="text-blue-600">$${quote.totalCost.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bind Conditions -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-3">BIND CONDITIONS</h2>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm space-y-2">
+                            <p><i class="fas fa-check-circle text-blue-600 mr-2"></i>Subject to current and acceptable MVR's</p>
+                            <p><i class="fas fa-check-circle text-blue-600 mr-2"></i>Subject to satisfactory CA SL-2</p>
+                        </div>
+                    </div>
+
+                    <!-- Important Conditions -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-3">IMPORTANT CONDITIONS</h2>
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm space-y-2">
+                            <p><i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>Subject to 25% minimum Earned Premium</p>
+                            <p><i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>Subject to satisfactory Signed & Dated NMA1651 Proposal Form within 21 days of attachment otherwise issue 30 days notice of Cancellation</p>
+                            <p><i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>Binding subject to no change in underwriting information provided and/or Claims record provided in quote submission</p>
+                        </div>
+                    </div>
+
+                    <!-- Required Forms -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-3">REQUIRED FORMS & DOCUMENTS</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <button onclick="downloadForm('nma-proposal')" class="w-full bg-gray-100 hover:bg-gray-200 p-3 rounded-lg text-left text-sm">
+                                    <i class="fas fa-download mr-2 text-blue-600"></i>NMA Proposal Form (NMA1651)
+                                </button>
+                                <button onclick="downloadForm('ca-sl2')" class="w-full bg-gray-100 hover:bg-gray-200 p-3 rounded-lg text-left text-sm">
+                                    <i class="fas fa-download mr-2 text-blue-600"></i>CA SL-2 Form
+                                </button>
+                            </div>
+                            <div class="space-y-2">
+                                <button onclick="downloadForm('wrb-gde')" class="w-full bg-gray-100 hover:bg-gray-200 p-3 rounded-lg text-left text-sm">
+                                    <i class="fas fa-download mr-2 text-blue-600"></i>WRB 2.5 GDE Form
+                                </button>
+                                <button onclick="downloadForm('nma1650')" class="w-full bg-gray-100 hover:bg-gray-200 p-3 rounded-lg text-left text-sm">
+                                    <i class="fas fa-download mr-2 text-blue-600"></i>NMA 1650 Form
+                                </button>
+                            </div>
+                        </div>
+                        ${quote.amendedDriver ? `
+                        <div class="mt-2">
+                            <button onclick="downloadForm('wrb-driver-criteria')" class="w-full bg-yellow-100 hover:bg-yellow-200 p-3 rounded-lg text-left text-sm">
+                                <i class="fas fa-download mr-2 text-orange-600"></i>WRB Driver Criteria (Amended 3yr minimum)
+                            </button>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="border-t pt-4 mt-6 text-sm text-gray-600">
+                        <p class="font-medium mb-2">Prepared by:</p>
+                        <p>Active E&S Underwriters</p>
+                        <p>Visit www.activeunderwriters.com to explore our product offerings</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('quoteDocument').innerHTML = quoteHTML;
+        }
+
+        function downloadForm(formType) {
+            const forms = {
+                'nma-proposal': {
+                    filename: 'NMA1651_Proposal_Form.doc',
+                    url: './forms/NMA1651_Proposal_Form.doc'
+                },
+                'ca-sl2': {
+                    filename: 'CA_SL2_Form.pdf', 
+                    url: './forms/CA_SL2_Form.pdf'
+                },
+                'wrb-gde': {
+                    filename: 'WRB_2.5_GDE_Form.doc',
+                    url: './forms/WRB_2.5_GDE_Form.doc'
+                },
+                'nma1650': {
+                    filename: 'NMA1650_Form.pdf',
+                    url: './forms/NMA1650_Form.pdf'
+                },
+                'wrb-driver-criteria': {
+                    filename: 'WRB_Driver_Criteria_Amended.doc',
+                    url: './forms/WRB_Driver_Criteria_Amended.doc'
+                }
+            };
+            
+            const form = forms[formType];
+            if (form) {
+                const link = document.createElement('a');
+                link.href = form.url;
+                link.download = form.filename;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        function loadSampleData() {
+            document.getElementById('namedInsured').value = 'Hayasatrans';
+            document.getElementById('tiv').value = '68000';
+            document.getElementById('rate').value = '6';
+            document.getElementById('carrier').value = 'LLOYDS';
+            document.getElementById('amendedDriver').checked = true;
+        }
+
+        function printQuote() {
+            window.print();
+        }
+
+        function saveQuote() {
+            if (!currentQuote) return;
+            
+            // Simple implementation - in production you'd use a proper PDF library
+            const element = document.getElementById('quoteDocument');
+            const opt = {
+                margin: 10,
+                filename: `Quote_${currentQuote.quoteNumber}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Note: This requires html2pdf.js library
+            alert(`Quote ${currentQuote.quoteNumber} saved!\n\nNote: In production, this would generate a PDF using html2pdf.js or similar library.`);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set today's date
+            document.getElementById('quoteDate')?.setAttribute('value', new Date().toISOString().split('T')[0]);
+        });
+    </script>
+</body>
+</html>
