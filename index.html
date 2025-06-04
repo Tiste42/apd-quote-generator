@@ -38,16 +38,17 @@
         .print-only { display: none; }
         
         .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 15px;
+}
         
-        .logo-container img {
-            max-height: 60px;
-            width: auto;
-            object-fit: contain;
-        }
+       .logo-container img {
+    max-height: 90px;
+    width: auto;
+    object-fit: contain;
+}
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -314,21 +315,21 @@
             
             const quoteHTML = `
                 <div class="space-y-6">
-                    <!-- Header with Logos -->
-                    <div class="logo-header border-b pb-4">
-                        <div class="flex justify-between items-start">
-                            <div class="logo-container">
-                                <img src="./activeexcesslogo.jpg" alt="Active E&S Logo" onerror="this.style.display='none'">
-                                <img src="./underwriters.jpeg" alt="Underwriters Logo" onerror="this.style.display='none'">
-                            </div>
-                            <div class="text-right">
-                                <h1 class="text-2xl font-bold text-gray-800 mb-2">AUTO PHYSICAL DAMAGE QUOTE</h1>
-                                <p class="text-gray-600">Quote #: ${quote.quoteNumber}</p>
-                                <p class="text-sm text-gray-600">Date: ${quoteDate}</p>
-                                <p class="text-sm text-gray-600">Valid for 30 days</p>
-                            </div>
-                        </div>
-                    </div>
+                   <!-- Header with Title -->
+<div class="text-center mb-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">AUTO PHYSICAL DAMAGE QUOTE</h1>
+</div>
+<div class="flex justify-between items-start border-b pb-4 mb-6">
+    <div class="logo-container">
+        <img src="./activeexcesslogo.jpg" alt="Active E&S Logo" onerror="this.style.display='none'">
+        <img src="./underwriters.jpeg" alt="Underwriters Logo" onerror="this.style.display='none'">
+    </div>
+    <div class="text-right">
+        <p class="text-gray-600 font-medium">Quote #: ${quote.quoteNumber}</p>
+        <p class="text-sm text-gray-600">Date: ${quoteDate}</p>
+        <p class="text-sm text-gray-600">Valid for 30 days</p>
+    </div>
+</div>
 
                     <!-- Named Insured Section -->
                     <div>
