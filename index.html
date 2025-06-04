@@ -23,6 +23,21 @@
                 margin: 0;
                 padding: 20px;
             }
+            .quote-document {
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0;
+    padding: 20px;
+    page-break-after: avoid !important;
+}
+.space-y-6 > * {
+    page-break-inside: avoid !important;
+}
+/* Prevent unnecessary page breaks */
+div, section, p {
+    page-break-after: avoid !important;
+}
             .logo-header {
                 display: flex !important;
                 align-items: center !important;
