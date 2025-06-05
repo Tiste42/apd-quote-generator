@@ -22,22 +22,15 @@
                 border: none !important;
                 margin: 0;
                 padding: 20px;
+                page-break-after: avoid !important;
             }
-            .quote-document {
-    max-width: 100% !important;
-    box-shadow: none !important;
-    border: none !important;
-    margin: 0;
-    padding: 20px;
-    page-break-after: avoid !important;
-}
-.space-y-6 > * {
-    page-break-inside: avoid !important;
-}
-/* Prevent unnecessary page breaks */
-div, section, p {
-    page-break-after: avoid !important;
-}
+            .space-y-6 > * {
+                page-break-inside: avoid !important;
+            }
+            /* Prevent unnecessary page breaks */
+            div, section, p {
+                page-break-after: avoid !important;
+            }
             .logo-header {
                 display: flex !important;
                 align-items: center !important;
@@ -53,17 +46,17 @@ div, section, p {
         .print-only { display: none; }
         
         .logo-container {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    margin-bottom: 15px;
-}
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 15px;
+        }
         
-       .logo-container img {
-    max-height: 90px;
-    width: auto;
-    object-fit: contain;
-}
+        .logo-container img {
+            max-height: 90px;
+            width: auto;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -100,15 +93,23 @@ div, section, p {
                             <label class="block text-sm font-medium text-gray-700 mb-1">TIV (Total Insured Value)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-2 text-gray-500">$</span>
-                                <input type="number" id="tiv" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="68000">
+                                <input type="number" id="tiv" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="120000">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Rate (%)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">TIV (Any One Unit)</label>
                             <div class="relative">
-                                <input type="number" id="rate" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="6.00">
-                                <span class="absolute right-3 top-2 text-gray-500">%</span>
+                                <span class="absolute left-3 top-2 text-gray-500">$</span>
+                                <input type="number" id="anyOneUnit" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="70000">
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Rate (%)</label>
+                        <div class="relative">
+                            <input type="number" id="rate" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="6.00">
+                            <span class="absolute right-3 top-2 text-gray-500">%</span>
                         </div>
                     </div>
 
@@ -263,6 +264,7 @@ div, section, p {
             
             const namedInsured = document.getElementById('namedInsured').value;
             const tiv = parseFloat(document.getElementById('tiv').value);
+            const anyOneUnit = parseFloat(document.getElementById('anyOneUnit').value) || tiv;
             const rate = parseFloat(document.getElementById('rate').value);
             const carrier = document.getElementById('carrier').value;
             const brokerFeeOverride = document.getElementById('brokerFeeOverride').value ? 
@@ -285,6 +287,7 @@ div, section, p {
                 carrier,
                 amendedDriver,
                 namedDriversOnly,
+                anyOneUnit,
                 ...calculation,
                 quoteDate: new Date().toISOString(),
                 quoteNumber: generateQuoteNumber()
@@ -337,7 +340,6 @@ div, section, p {
 <div class="flex justify-between items-start border-b pb-4 mb-6">
     <div class="logo-container">
         <img src="./activeexcesslogo.jpg" alt="Active E&S Logo" onerror="this.style.display='none'">
-        <img src="./underwriters.jpeg" alt="Underwriters Logo" onerror="this.style.display='none'">
     </div>
     <div class="text-right">
         <p class="text-gray-600 font-medium">Quote #: ${quote.quoteNumber}</p>
@@ -359,6 +361,7 @@ div, section, p {
                             <div class="flex justify-between"><span class="font-medium">Carrier:</span><span>${quote.carrier}</span></div>
                             <div class="flex justify-between"><span class="font-medium">Coverage Type:</span><span>APD - Auto Physical Damage</span></div>
                             <div class="flex justify-between"><span class="font-medium">Total Insured Value:</span><span>$${quote.tiv.toLocaleString()}</span></div>
+                            <div class="flex justify-between"><span class="font-medium">Any One Unit Limit:</span><span>$${quote.anyOneUnit.toLocaleString()}</span></div>
                             <div class="flex justify-between"><span class="font-medium">Rate:</span><span>${quote.rate}%</span></div>
                         </div>
                     </div>
@@ -369,7 +372,7 @@ div, section, p {
                         <div class="space-y-2 text-sm">
                             <p><i class="fas fa-check text-green-500 mr-2"></i>WRB 2.5k GDE ENDT (standard)</p>
                             <p><i class="fas fa-check text-green-500 mr-2"></i>NMA1650</p>
-                            <p><i class="fas fa-check text-green-500 mr-2"></i>Limit: $${quote.tiv.toLocaleString()} Any one loss / Any one unit</p>
+                            <p><i class="fas fa-check text-green-500 mr-2"></i>Limit: $${quote.anyOneUnit.toLocaleString()} (Any One Unit) / $${quote.tiv.toLocaleString()} (Total)</p>
                             ${driverCriteriaText}
                             <p><i class="fas fa-check text-green-500 mr-2"></i>$5,000 AOL sublimit tow/store/recovery</p>
                             <p><i class="fas fa-check text-green-500 mr-2"></i>WRB APD endt</p>
@@ -498,7 +501,8 @@ div, section, p {
 
         function loadSampleData() {
             document.getElementById('namedInsured').value = 'Hayasatrans';
-            document.getElementById('tiv').value = '68000';
+            document.getElementById('tiv').value = '120000';
+            document.getElementById('anyOneUnit').value = '70000';
             document.getElementById('rate').value = '6';
             document.getElementById('carrier').value = 'LLOYDS';
             document.getElementById('amendedDriver').checked = true;
